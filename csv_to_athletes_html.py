@@ -51,14 +51,12 @@ def gen_athlete_page(data, outfile):
        <!-- Get your own FontAwesome ID -->
        <script src="https://kit.fontawesome.com/YOUR_ID.js" crossorigin="anonymous"></script>
 
-
-      <link rel = "stylesheet" href = "css/reset.css">
-      <link rel = "stylesheet" href = "css/style.css">
-      
+      <link rel="stylesheet" href="../css/reset.css">
+      <link rel="stylesheet" href="../css/style.css">
 
       <title>{data["name"]}</title>
    </head>
-   <body>
+   <body class="light-mode">
    <a href = "#main">Skip to Main Content</a>
    <nav>
      <ul>
@@ -67,6 +65,10 @@ def gen_athlete_page(data, outfile):
         <li><a href="womens.html">Women's Team</a></li>
      </ul>
    </nav>
+
+   <button id="mode-toggle">Light Mode (Click Twice)</button>
+   <button id="high-contrast-toggle">Dark Mode</button>
+
    <header>
       <!--Athlete would input headshot-->
        <h1>{data["name"]}</h1>
@@ -138,6 +140,8 @@ def gen_athlete_page(data, outfile):
                      </section>
                      <section id = "gallery">
                      <h2>Gallery</h2>
+                     <a href="#" id="open-gallery">Click here to view the gallery</a>
+                     <div id="gallery-container"></div> <!-- Container for the images -->
                       </section>
                      </main>
                      <footer>
@@ -147,68 +151,68 @@ def gen_athlete_page(data, outfile):
                      2552 North Maple Road<br>
                      Ann Arbor, MI 48103<br><br>
 
-                     <a href = "https://sites.google.com/aaps.k12.mi.us/skylinecrosscountry2021/home">XC Skyline Page</a><br>
-                    Follow us on Instagram <a href = "https://www.instagram.com/a2skylinexc/"><i class="fa-brands fa-instagram" aria-label="Instagram"></i>  </a> 
+                    <a href="https://www.instagram.com/a2skylinexc/" aria-label="Follow us on Instagram">
+                        <i class="fa-brands fa-instagram"></i> Follow us on Instagram </a>
 
 
                      </footer>
+<!-- JavaScript for Light/Dark Mode, High Contrast Mode, and Gallery -->
+<script>
+   document.getElementById('mode-toggle').addEventListener('click', function() {
+      if (document.body.classList.contains('dark-mode')) {
+         document.body.classList.remove('dark-mode');
+         document.body.classList.add('light-mode');
+         document.getElementById('mode-toggle').innerText = 'Dark Mode';
+      } else {
+         document.body.classList.remove('light-mode');
+         document.body.classList.add('dark-mode');
+         document.getElementById('mode-toggle').innerText = 'Light Mode (Click Twice)';
+      }
+   });
+
+   document.getElementById('high-contrast-toggle').addEventListener('click', function() {
+      document.body.classList.toggle('high-contrast-mode');
+      document.body.classList.remove('dark-mode'); /* Reset dark mode */
+      document.body.classList.remove('light-mode'); /* Reset light mode */
+      document.getElementById('mode-toggle').innerText = 'Dark Mode';
+   });
+
+   // JavaScript for loading gallery images dynamically
+   document.getElementById('open-gallery').addEventListener('click', function() {
+      // Show the gallery section
+      document.getElementById('gallery').style.display = 'block';
+      
+      // Target container for gallery images
+      const galleryContainer = document.getElementById('gallery-container');
+
+      // Clear the gallery container before loading new images
+      galleryContainer.innerHTML = '';
+
+      // List of folders inside 'gallery_images'
+      const folders = ['235827', '236072', '236875', '238311', '943367', '947091'];
+
+      // Base path to gallery_images folder
+      const basePath = '../gallery_images/';  // Adjust path based on your folder structure
+
+      // Loop through each folder and load images
+      folders.forEach(folder => {
+          const folderPath = basePath + folder + '/';
+          
+          // Dynamically add image elements
+          for (let i = 1; i <= 5; i++) {  // Assuming 5 images per folder
+              const img = document.createElement('img');
+              img.src = folderPath + `image${i}.jpg`; // Adjust filename pattern if necessary
+              img.alt = `Image ${i} from folder ${folder}`;
+              img.classList.add('gallery-image');
+              galleryContainer.appendChild(img);
+          }
+      });
+   });
+</script>
+
                </body>
          </html>
    '''
 
    with open(outfile, 'w') as output:
       output.write(html_content)
-
-
-def main():
-
-   import os
-   import glob
-
-   # Define the folder path
-   folder_path = 'mens_team/'
-   # Get all csv files in the folder
-   csv_files = glob.glob(os.path.join(folder_path, '*.csv'))
-
-   # Extract just the file names (without the full path)
-   csv_file_names = [os.path.basename(file) for file in csv_files]
-
-   # Output the list of CSV file names
-   print(csv_file_names)
-   for file in csv_file_names:
-
-      # read data from file
-      athlete_data = process_athlete_data("mens_team/"+file)
-      # using data to generate templated athlete page
-      gen_athlete_page(athlete_data, "mens_team/"+file.replace(".csv",".html"))
-
-      # read data from file
-      # athlete_data2 = process_athlete_data(filename2)
-      # using data to generate templated athlete page
-      # gen_athlete_page(athlete_data2, "enshu_kuan.html")
-
-
-   # Define the folder path
-   folder_path = 'womens_team/'
-   # Get all csv files in the folder
-   csv_files = glob.glob(os.path.join(folder_path, '*.csv'))
-
-   # Extract just the file names (without the full path)
-   csv_file_names = [os.path.basename(file) for file in csv_files]
-
-   # Output the list of CSV file names
-   print(csv_file_names)
-   for file in csv_file_names:
-
-      # read data from file
-      athlete_data = process_athlete_data("womens_team/"+file)
-      # using data to generate templated athlete page
-      gen_athlete_page(athlete_data, "womens_team/"+file.replace(".csv",".html"))
-
-      # read data from file
-      # athlete_data2 = process_athlete_data(filename2)
-      # using data to generate templated athlete page
-      # gen_athlete_page(athlete_data2, "enshu_kuan.html")
-
-if __name__ == '__main__':
-    main()
